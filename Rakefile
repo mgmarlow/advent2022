@@ -2,8 +2,8 @@ require "benchmark"
 
 task(:benchmark) do
   Benchmark.bm do |x|
-    Dir["./src/*.rb"].each do |filename|
-      x.report(filename) { ruby(filename) }
+    Dir["./src/*.lisp"].each do |filename|
+      x.report(filename + ": ") { puts `sbcl --script #{filename}` }
     end
   end
 end
