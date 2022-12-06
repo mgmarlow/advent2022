@@ -1,13 +1,10 @@
 (defparameter *raw-signal*
   (with-open-file (in "./data/day06.txt")
-    (first
-     (loop for line = (read-line in nil)
-           while line
-           collect line))))
+    (read-line in nil)))
 
 (defun unique-p (str)
   (= (length (remove-duplicates str :test #'char-equal))
-      (length str)))
+     (length str)))
 
 (defun find-packet-marker (start-of-packet-length)
   (loop for i from 0
