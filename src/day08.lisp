@@ -70,16 +70,6 @@
                     (incf sum)))
     sum))
 
-(defun direction-scenic-score (dirfn x y item)
-  (let ((score 0))
-    (block outer
-      (funcall dirfn x y #'(lambda (other)
-                             (if (< other item)
-                                 (incf score)
-                                 (return-from outer (incf score)))))
-      
-      score)))
-
 (defun top-scenic-score (x y item)
   (let ((score 0))
     (foreach-up x y (if (< other item)
