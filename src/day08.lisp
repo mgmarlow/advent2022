@@ -8,44 +8,45 @@
 (defmacro matrix-get (x y matrix)
   `(nth ,x (nth ,y ,matrix)))
 
-(defun foreach-up (x y fn)
-  (loop for i from (1- y) downto 0 do
-    (let ((other (matrix-get x i *matrix*)))
-      (funcall fn other))))
+(defmacro foreach-up (x y &body body)
+  `(loop for i from (1- ,y) downto 0 do
+    (let ((other (matrix-get ,x i *matrix*)))
+      ,@body)))
 
-(defun foreach-right (x y fn)
-  (loop for i from (1+ x) to (1- (length (first *matrix*))) do
-    (let ((other (matrix-get i y *matrix*)))
-      (funcall fn other))))
+(defmacro foreach-right (x y &body body)
+  `(loop for i from (1+ ,x) to (1- (length (first *matrix*))) do
+    (let ((other (matrix-get i ,y *matrix*)))
+      ,@body)))
 
-(defun foreach-down (x y fn)
-  (loop for i from (1+ y) to (1- (length *matrix*)) do
-    (let ((other (matrix-get x i *matrix*)))
-      (funcall fn other))))
+(defmacro foreach-down (x y &body body)
+  `(loop for i from (1+ ,y) to (1- (length *matrix*)) do
+    (let ((other (matrix-get ,x i *matrix*)))
+      ,@body)))
 
-(defun foreach-left (x y fn)
-  (loop for i from (1- x) downto 0 do
-    (let ((other (matrix-get i y *matrix*)))
-      (funcall fn other))))
-
-(defun direction-visiblep (dirfn x y item)
-  (let ((any-taller))
-    (funcall dirfn x y #'(lambda (other)
-                           (when (>= other item)
-                             (setf any-taller t))))
-    (not any-taller)))
+(defmacro foreach-left (x y &body body)
+  `(loop for i from (1- ,x) downto 0 do
+    (let ((other (matrix-get i ,y *matrix*)))
+      ,@body)))
 
 (defun top-visiblep (x y item)
-  (direction-visiblep #'foreach-up x y item))
+  (foreach-up x y (when (>= other item)
+                    (return-from top-visiblep nil)))
+  t)
 
 (defun right-visiblep (x y item)
-  (direction-visiblep #'foreach-right x y item))
+  (foreach-right x y (when (>= other item)
+                       (return-from right-visiblep nil)))
+  t)
 
 (defun bottom-visiblep (x y item)
-  (direction-visiblep #'foreach-down x y item))
+  (foreach-down x y (when (>= other item)
+                      (return-from bottom-visiblep nil)))
+  t)
 
 (defun left-visiblep (x y item)
-  (direction-visiblep #'foreach-left x y item))
+  (foreach-left x y (when (>= other item)
+                      (return-from left-visiblep nil)))
+  t)
 
 (defun visiblep (x y)
   (let ((item (matrix-get x y *matrix*)))
@@ -80,16 +81,32 @@
       score)))
 
 (defun top-scenic-score (x y item)
-  (direction-scenic-score #'foreach-up x y item))
+  (let ((score 0))
+    (foreach-up x y (if (< other item)
+                        (incf score)
+                        (return (incf score))))
+    score))
 
 (defun right-scenic-score (x y item)
-  (direction-scenic-score #'foreach-right x y item))
+  (let ((score 0))
+    (foreach-right x y (if (< other item)
+                           (incf score)
+                           (return (incf score))))
+    score))
 
 (defun bottom-scenic-score (x y item)
-  (direction-scenic-score #'foreach-down x y item))
+  (let ((score 0))
+    (foreach-down x y (if (< other item)
+                          (incf score)
+                          (return (incf score))))
+    score))
 
 (defun left-scenic-score (x y item)
-  (direction-scenic-score #'foreach-left x y item))
+  (let ((score 0))
+    (foreach-left x y (if (< other item)
+                          (incf score)
+                          (return (incf score))))
+    score))
 
 (defun scenic-score (x y)
   (let ((item (matrix-get x y *matrix*)))
@@ -104,8 +121,8 @@
           for row in *matrix* do
             (loop for x from 0
                   for col in row do
-                  (let ((score (scenic-score x y)))
-                    (when (> score max-score) (setf max-score score)))))
+                    (let ((score (scenic-score x y)))
+                      (when (> score max-score) (setf max-score score)))))
     max-score))
 
 (format t "P1: ~a; P2: ~a~%" (trees-visible) (highest-scenic-score))
