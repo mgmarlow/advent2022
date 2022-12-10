@@ -71,18 +71,16 @@
       ((> (abs (y delta)) 1) (new-point 0 (sign (y delta))))
       (t (new-point 0 0)))))
 
-(defun p1-find-visited-tail-positions ()
-  (let ((positions '("0,0")) (head (new-point 0 0)) (tail (new-point 0 0)))
-    (loop for command in *commands* do
-      (move head command)
-      (let ((tail-move (find-next-tail-move head tail)))
-        (move tail tail-move)
-        (push (format nil "~a,~a" (x tail) (y tail)) positions)))
-    (length (delete-duplicates positions :test #'string=))))
+(defun count-keys (hsh)
+  (loop for i from 0
+        for k being the hash-keys in hsh
+        counting i into total
+        finally (return total)))
 
-(defun p2-find-visited-tail-positions ()
-  (let ((positions '("0,0"))
-        (snake (loop for i from 0 to 9 collect (new-point 0 0))))
+(defun find-visited-tail-positions (snake-length)
+  (let* ((positions (make-hash-table :test 'equal))
+         (snake (loop for i from 0 to (1- snake-length) collect (new-point 0 0)))
+         (tail (nth (1- snake-length) snake)))
     (loop for command in *commands* do
       (move (first snake) command)
       (loop for i from 1 to (1- (length snake)) do
@@ -90,7 +88,7 @@
                (tail (nth i snake))
                (tail-move (find-next-tail-move head tail)))
           (move tail tail-move)))
-      (push (format nil "~a,~a" (x (nth 9 snake)) (y (nth 9 snake))) positions))
-    (length (delete-duplicates positions :test #'string=))))
+      (setf (gethash (format nil "~a,~a" (x tail) (y tail)) positions) 1))
+    (count-keys positions)))
 
-(format t "P1: ~a; P2: ~a~%" (p1-find-visited-tail-positions) (p2-find-visited-tail-positions))
+(format t "P1: ~a; P2: ~a~%" (find-visited-tail-positions 2) (find-visited-tail-positions 10))
