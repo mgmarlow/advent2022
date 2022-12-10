@@ -1,5 +1,5 @@
 (defparameter *raw-signal*
-  (with-open-file (in "./data/day06.txt")
+  (with-open-file (in "../data/day06.txt")
     (read-line in nil)))
 
 (defun unique-p (str)

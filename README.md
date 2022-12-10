@@ -20,18 +20,7 @@ sbcl --no-sysinit --no-userinit --load /tmp/ql.lisp \
      --quit
 ```
 
-Install ruby dependencies (if running rake task for benchmarks):
-
-```
-bundle
-```
-
 ## Run
 
-> Note: benchmarks aren't super accurate, especially for exercises that load quicklisp libraries.
+Open up a file in Emacs and run [`M-x sly-eval-buffer`](https://github.com/joaotavora/sly).
 
-Print answers for each day with benchmarks:
-
-```
-bin/rake benchmark
-```

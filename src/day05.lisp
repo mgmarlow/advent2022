@@ -1,4 +1,3 @@
-(load "~/.quicklisp/setup.lisp")
 (ql:quickload "cl-utilities")
 
 ;; [T]             [P]     [J]        
@@ -59,7 +58,7 @@
                    :target target)))
 
 (defun read-instructions ()
-  (with-open-file (in "./data/day05.txt")
+  (with-open-file (in "../data/day05.txt")
     (loop for line = (read-line in nil)
           while line
           when (instructionp line)

@@ -1,4 +1,3 @@
-(load "~/.quicklisp/setup.lisp")
 (ql:quickload "cl-utilities")
 
 (defun flatten (l)
@@ -52,7 +51,7 @@
       (t (error "invalid input when parsing command")))))
 
 (defparameter *commands*
-  (with-open-file (in "./data/day09.txt")
+  (with-open-file (in "../data/day09.txt")
     (flatten
      (loop for line = (read-line in nil)
            while line

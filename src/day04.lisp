@@ -9,7 +9,7 @@
           (build-pair (subseq line (1+ midpoint) (length line))))))
 
 (defun read-elf-pairs ()
-  (with-open-file (in "./data/day04.txt")
+  (with-open-file (in "../data/day04.txt")
     (loop for line = (read-line in nil)
           while line
           collect (elf-pair line))))

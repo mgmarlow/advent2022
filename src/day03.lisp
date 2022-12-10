@@ -7,7 +7,7 @@
 (defun priority (item)
   (1+ (position item "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")))
 
-(defvar *rucksacks* (read-into-list "./data/day03.txt"))
+(defvar *rucksacks* (read-into-list "../data/day03.txt"))
 
 (defun divide-compartments (rucksack)
   (let ((midpoint (/ (length rucksack) 2)))

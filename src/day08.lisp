@@ -1,5 +1,5 @@
 (defparameter *matrix*
-  (with-open-file (in "./data/day08.txt")
+  (with-open-file (in "../data/day08.txt")
     (loop for line = (read-line in nil)
           while line
           when (> (length line) 0)

@@ -1,4 +1,3 @@
-(load "~/.quicklisp/setup.lisp")
 (ql:quickload "cl-utilities")
 
 (defclass node ()
@@ -66,7 +65,7 @@
   (size dir))
 
 (defun build-file-system ()
-  (with-open-file (in "./data/day07.txt")
+  (with-open-file (in "../data/day07.txt")
     (loop for line = (read-line in nil)
           while line
           when (> (length line) 0) do

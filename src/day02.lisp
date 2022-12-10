@@ -2,7 +2,7 @@
   (cons (char str 0) (char str 2)))
 
 (defun strategy-guide ()
-  (with-open-file (in "./data/day02.txt")
+  (with-open-file (in "../data/day02.txt")
     (loop for line = (read-line in nil)
           while line
           collect (cons-line line))))

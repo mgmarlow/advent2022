@@ -16,7 +16,7 @@
 
 (defun totals ()
   (let ((totals ()))
-    (foreach-sum "./data/day01.txt"
+    (foreach-sum "../data/day01.txt"
                  #'(lambda (sum) (setf totals (cons sum totals))))
     totals))
 
