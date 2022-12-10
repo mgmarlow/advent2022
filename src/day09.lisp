@@ -52,7 +52,7 @@
       (t (error "invalid input when parsing command")))))
 
 (defparameter *commands*
-  (with-open-file (in "../data/day09.txt")
+  (with-open-file (in "./data/day09.txt")
     (flatten
      (loop for line = (read-line in nil)
            while line
@@ -77,9 +77,8 @@
     (loop for command in *commands* do
       (move head command)
       (let ((tail-move (find-next-tail-move head tail)))
-        (unless (point-zerop tail-move)
-          (move tail tail-move)
-          (push (format nil "~a,~a" (x tail) (y tail)) positions))))
+        (move tail tail-move)
+        (push (format nil "~a,~a" (x tail) (y tail)) positions)))
     (length (delete-duplicates positions :test #'string=))))
 
 (defun p2-find-visited-tail-positions ()
@@ -94,3 +93,5 @@
           (move tail tail-move)))
       (push (format nil "~a,~a" (x (nth 9 snake)) (y (nth 9 snake))) positions))
     (length (delete-duplicates positions :test #'string=))))
+
+(format t "P1: ~a; P2: ~a~%" (p1-find-visited-tail-positions) (p2-find-visited-tail-positions))
