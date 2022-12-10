@@ -82,3 +82,15 @@
           (push (format nil "~a,~a" (x tail) (y tail)) positions))))
     (length (delete-duplicates positions :test #'string=))))
 
+(defun p2-find-visited-tail-positions ()
+  (let ((positions '("0,0"))
+        (snake (loop for i from 0 to 9 collect (new-point 0 0))))
+    (loop for command in *commands* do
+      (move (first snake) command)
+      (loop for i from 1 to (1- (length snake)) do
+        (let* ((head (nth (1- i) snake))
+               (tail (nth i snake))
+               (tail-move (find-next-tail-move head tail)))
+          (move tail tail-move)))
+      (push (format nil "~a,~a" (x (nth 9 snake)) (y (nth 9 snake))) positions))
+    (length (delete-duplicates positions :test #'string=))))
