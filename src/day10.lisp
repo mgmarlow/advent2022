@@ -51,7 +51,6 @@
     ;; ignore noop
     ((string= "addx" (command instruction)) (incf (regx m) (value instruction)))))
 
-;; look at clock & current-instruction here
 (defmethod run ((m cpu) instructions cb)
   (let ((current-instruction))
     (loop while (> (length instructions) 0) do
@@ -75,4 +74,21 @@
                                            (incf sum (signal-strength m)))))
     sum))
 
-(format t "P1: ~a; P2: ~a~%" (p1-cycles) 'todo)
+(defun draw-pixel (m crt-width)
+  ;; Cycles start at 1, pixels start at 0
+  (let ((current-pixel (rem (1- (cycle m)) crt-width)))
+    (if (or
+         (= current-pixel (regx m))
+         (= current-pixel (1+ (regx m)))
+         (= current-pixel (1- (regx m))))
+        (format t "#")
+        (format t "."))))
+
+(defun draw-crt ()
+  (let ((machine (make-instance 'cpu)) (crt-width 40))
+    (run machine (read-instructions) #'(lambda (m)
+                                         (draw-pixel m crt-width)
+                                         (when (= (mod (cycle m) crt-width) 0)
+                                           (format t "~%"))))))
+
+(format t "P1: ~a; P2: ~a~%" (p1-cycles) (draw-crt))
