@@ -42,9 +42,7 @@
     :accessor cycle)
    (regx
     :initform 1
-    :accessor regx)
-   (current-instruction
-    :accessor current-instruction)))
+    :accessor regx)))
 
 (defmethod process-instruction ((m cpu) instruction)
   (cond
