@@ -1,11 +1,5 @@
 (ql:quickload "cl-utilities")
 
-(defun units-of-work (command)
-  (cond
-    ((string= command "noop") 1)
-    ((string= command "addx") 2)
-    (t 0)))
-
 (defclass operation ()
   ((work
     :initarg :work
@@ -17,12 +11,17 @@
     :initarg :value
     :accessor value)))
 
+(defmethod work ((op operation))
+  (cond
+    ((string= (command op) "noop") 1)
+    ((string= (command op) "addx") 2)
+    (t 0)))
+
 (defun new-operation (line)
   (let* ((parsed (cl-utilities:split-sequence #\SPACE line))
          (command (first parsed))
          (value (second parsed)))
     (make-instance 'operation
-                   :work (units-of-work command)
                    :command command
                    :value (when value (parse-integer value)))))
 
