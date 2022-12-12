@@ -1,10 +1,7 @@
 (ql:quickload "cl-utilities")
 
 (defclass operation ()
-  ((work
-    :initarg :work
-    :accessor work)
-   (command
+  ((command
     :initarg :command
     :accessor command)
    (value
