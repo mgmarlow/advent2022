@@ -21,26 +21,45 @@
                          finally (return (list evens odds)))))
       (reduce #'(lambda (a b) (mapcar 'list a b)) pairs))))
 
-;; TODO: Revisit recursive solution
-;; (defun validate-pair (l1 l2)
-;;   (loop for a in l1
-;;         for b in l2 do
-;;           (block iteration
-;;             (cond
-;;               ((and (null a) (not (null b))) t)
-;;               ((and (not (null a)) (null b)) nil)
-;;               ((and (null a) (null b)) (return-from iteration))
-;;               ((and (integerp a) (integerp b)) (cond
-;;                                                  ((= a b) (return-from iteration))
-;;                                                  (t (< a b))))
-;;               ((and (listp a) (listp b)) (validate-pair a b))
-;;               ((integerp a) (validate-pair (list a) b))
-;;               ((integerp b) (validate-pair a (list b)))))))
+(defun rvalid (left right)
+  (cond
+    ((and (null left) (null right)) 'continue)
+    ((and (null left) (not (null right))) 'valid)
+    ((and (not (null left)) (null right)) 'invalid)
+    ((and (integerp left) (integerp right))
+     (cond ((= left right) 'continue)
+           ((< left right) 'valid)
+           (t 'invalid)))
+    ((and (listp left) (listp right))
+     (progn (loop for lprime in left
+                  for rprime in right do
+                    (let ((rst (rvalid lprime rprime)))
+                      (unless (equal rst 'continue)
+                        (return-from rvalid rst)))))
+     (cond
+       ((= (length left) (length right)) 'continue)
+       (t (if (< (length left) (length right)) 'valid 'invalid))))
+    ((and (listp left) (integerp right))
+     (rvalid left (list right)))
+    ((and (integerp left) (listp right))
+     (rvalid (list left) right))
+    (t 'valid)))
+
+(defun validate-pair (l1 l2)
+  (loop for left in l1
+        for right in l2 do
+          (let ((rst (rvalid left right)))
+            (unless (equal rst 'continue)
+              (return-from validate-pair rst))))
+  (if (< (length l1) (length l2)) 'valid 'invalid))
+
+(defun valid-pair (l1 l2)
+  (equal (validate-pair l1 l2) 'valid))
 
 (defun validate-pairs ()
   (loop for pair in *input-pairs*
         for i from 1
-        if (validate-pair (first pair) (second pair))
+        if (valid-pair (first pair) (second pair))
           summing i into validated
         end
         finally (return validated)))
