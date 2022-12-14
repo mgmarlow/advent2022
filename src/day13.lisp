@@ -11,6 +11,7 @@
                         while line
                         when (> (length line) 0)
                           collect (convert-to-list line)))
+           ;; TODO: This can be cleaned up
            (pairs (loop for lst in lists
                          for i from 0
                          if (evenp i)
@@ -21,40 +22,24 @@
                          finally (return (list evens odds)))))
       (reduce #'(lambda (a b) (mapcar 'list a b)) pairs))))
 
+
 (defun rvalid (left right)
   (cond
-    ((and (null left) (null right)) 'continue)
-    ((and (null left) (not (null right))) 'valid)
-    ((and (not (null left)) (null right)) 'invalid)
-    ((and (integerp left) (integerp right))
-     (cond ((= left right) 'continue)
-           ((< left right) 'valid)
-           (t 'invalid)))
-    ((and (listp left) (listp right))
-     (progn (loop for lprime in left
-                  for rprime in right do
-                    (let ((rst (rvalid lprime rprime)))
-                      (unless (equal rst 'continue)
-                        (return-from rvalid rst)))))
-     (cond
-       ((= (length left) (length right)) 'continue)
-       (t (if (< (length left) (length right)) 'valid 'invalid))))
-    ((and (listp left) (integerp right))
-     (rvalid left (list right)))
-    ((and (integerp left) (listp right))
-     (rvalid (list left) right))
-    (t 'valid)))
-
-(defun validate-pair (l1 l2)
-  (loop for left in l1
-        for right in l2 do
-          (let ((rst (rvalid left right)))
-            (unless (equal rst 'continue)
-              (return-from validate-pair rst))))
-  (if (< (length l1) (length l2)) 'valid 'invalid))
+    ((and (integerp left) (integerp right) (< left right)) 1)
+    ((and (integerp left) (integerp right) (> left right)) 0)
+    ((and (integerp left) (integerp right) (= left right)) -1)
+    ((and (null left) (listp right)) 1)
+    ((and (listp left) (null right)) 0)
+    ((and (null left) (null right)) -1)
+    ((and (integerp left) (listp right)) (rvalid (list left) right))
+    ((and (listp left) (integerp right)) (rvalid left (list right)))
+    (t (let ((rst (rvalid (first left) (first right))))
+         (if (= rst -1)
+             (rvalid (rest left) (rest right))
+             rst)))))
 
 (defun valid-pair (l1 l2)
-  (equal (validate-pair l1 l2) 'valid))
+  (= (rvalid l1 l2) 1))
 
 (defun validate-pairs ()
   (loop for pair in *input-pairs*
