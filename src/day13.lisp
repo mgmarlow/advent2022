@@ -5,34 +5,29 @@
     (setf rst (substitute #\) #\] rst))
     (read-from-string rst)))
 
-(defparameter *input-pairs*
+(defparameter *input-lists*
   (with-open-file (in "../data/day13.txt")
-    (let* ((lists (loop for line = (read-line in nil)
-                        while line
-                        when (> (length line) 0)
-                          collect (convert-to-list line)))
-           ;; TODO: This can be cleaned up
-           (pairs (loop for lst in lists
-                         for i from 0
-                         if (evenp i)
-                           collect lst into evens
-                         else
-                           collect lst into odds
-                         end
-                         finally (return (list evens odds)))))
-      (reduce #'(lambda (a b) (mapcar 'list a b)) pairs))))
+    (loop for line = (read-line in nil)
+          while line
+          when (> (length line) 0)
+            collect (convert-to-list line))))
 
+(defparameter *input-pairs*
+  (loop for el on *input-lists*
+      if (and (>= (length el) 2)
+              (= (mod (length el) 2) 0))
+        collect (subseq el 0 2)))
 
 (defun rvalid (left right)
   (cond
-    ((and (integerp left) (integerp right) (< left right)) 1)
-    ((and (integerp left) (integerp right) (> left right)) 0)
-    ((and (integerp left) (integerp right) (= left right)) -1)
+    ((and (numberp left) (numberp right) (< left right)) 1)
+    ((and (numberp left) (numberp right) (> left right)) 0)
+    ((and (numberp left) (numberp right) (= left right)) -1)
+    ((and (numberp left) (listp right)) (rvalid (list left) right))
+    ((and (listp left) (numberp right)) (rvalid left (list right)))
     ((and (null left) (listp right)) 1)
     ((and (listp left) (null right)) 0)
     ((and (null left) (null right)) -1)
-    ((and (integerp left) (listp right)) (rvalid (list left) right))
-    ((and (listp left) (integerp right)) (rvalid left (list right)))
     (t (let ((rst (rvalid (first left) (first right))))
          (if (= rst -1)
              (rvalid (rest left) (rest right))
@@ -48,3 +43,11 @@
           summing i into validated
         end
         finally (return validated)))
+
+(defun sorted-divider-packet-indices ()
+  (let* ((packets (append *input-lists* '(((2)) ((6)))))
+         (sorted (sort packets #'valid-pair)))
+    (* (1+ (position '((2)) sorted :test 'equal))
+       (1+ (position '((6)) sorted :test 'equal)))))
+
+(format t "P1: ~a; P2: ~a~%" (validate-pairs) (sorted-divider-packet-indices))
