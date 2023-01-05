@@ -1,30 +1,26 @@
-(defun foreach-line (file fn)
-  (with-open-file (in file)
-    (when in
-      (loop for line = (read-line in nil)
-            while line do (funcall fn line)))))
+(defparameter *rawinput*
+  (with-open-file (in "../data/day01.txt")
+    (loop for line = (read-line in nil)
+          while line
+          collect line)))
 
-(defun foreach-sum (file fn)
-  (let ((current 0))
-    (foreach-line file
-                  #'(lambda (line)
-                      (if (= (length line) 0)
-                          (progn
-                            (funcall fn current)
-                            (setf current 0))
-                          (incf current (parse-integer line)))))))
+(defparameter *calories-per-elf*
+  (let ((elves ()) (current 0))
+    (loop for calories in *rawinput* do
+      (if (> (length calories) 0)
+          (incf current (parse-integer calories))
+          (progn
+            (push current elves)
+            (setf current 0))))
+    ;; Don't forget the last one!
+    (push current elves)
+    elves))
 
-(defun totals ()
-  (let ((totals ()))
-    (foreach-sum "../data/day01.txt"
-                 #'(lambda (sum) (setf totals (cons sum totals))))
-    totals))
+(defun most-calories ()
+  (apply #'max *calories-per-elf*))
 
-(defun day1part1 ()
-  (reduce #'max (totals)))
+(defun top-three-summed ()
+  (let ((sorted (sort *calories-per-elf* #'>)))
+    (+ (first sorted) (second sorted) (third sorted))))
 
-(defun day1part2 ()
-  (let ((sorted-totals (sort (totals) #'>)))
-    (+ (first sorted-totals) (second sorted-totals) (third sorted-totals))))
-
-(format t "P1: ~a; P2: ~a~%" (day1part1) (day1part2))
+(format t "P1: ~a; P2: ~a~%" (most-calories) (top-three-summed))
